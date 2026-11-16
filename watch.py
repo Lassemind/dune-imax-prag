@@ -28,6 +28,9 @@ UA = (
 
 FILM_PATTERN = os.environ.get("FILM_PATTERN", "duna").lower()
 AUDITORIUM_PATTERN = os.environ.get("AUDITORIUM_PATTERN", "imax").lower()
+# Zusätzlich muss der Filmtitel das enthalten (leer = aus). Filtert z. B. die
+# Wiederaufführung von Teil 1, die ebenfalls "Duna" heißt.
+FILM_REQUIRE = os.environ.get("FILM_REQUIRE", "část třetí").lower()
 HORIZON_DAYS = int(os.environ.get("HORIZON_DAYS", "180"))
 # Atribut, podle kterého API umí filtrovat kina — levná nápověda, kde hledat
 # IMAX sály. Doplňuje (nenahrazuje) sondu podle názvu sálu.
@@ -123,6 +126,8 @@ def collect():
             for e in events:
                 film = films.get(e["filmId"], {})
                 if FILM_PATTERN not in film.get("name", "").lower():
+                    continue
+                if FILM_REQUIRE and FILM_REQUIRE not in film.get("name", "").lower():
                     continue
                 if not is_target_hall(e):
                     continue
