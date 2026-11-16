@@ -53,6 +53,8 @@ jobs:
           FILM_REQUIRE: "část třetí"
           AUDITORIUM_PATTERN: imax
           REQUIRE_ATTR: 70-mm
+          # Wird im Text erwähnt (@…) – dadurch kommt genau eine E-Mail.
+          MENTION: ${{ github.repository_owner }}
         run: |
           python3 watch.py \
             --state state/seen.json \
@@ -65,20 +67,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Die Zuweisung an den Besitzer ist entscheidend: GitHub schickt
-          # E-Mails standardmäßig nur bei "Participating"-Benachrichtigungen
-          # (Zuweisung, Erwähnung). Reines "Watching" des Repos gibt nur eine
-          # Web-/Mobil-Benachrichtigung, E-Mail ist dort ausgeschaltet.
+          # Der Besitzer wird im Text per @-Erwähnung angesprochen. Das zählt
+          # als "Participating", GitHub schickt also eine E-Mail – und zwar
+          # genau eine. (Zuweisen und Schließen würden je eine weitere,
+          # verwirrende Mail auslösen, deshalb passiert beides nicht.)
           url=$(gh issue create \
             --title "$(cat title.txt)" \
-            --body-file report.md \
-            --assignee "${{ github.repository_owner }}")
+            --body-file report.md)
           echo "Angelegt: $url"
-          # Das Issue ist nur der Zustellkanal für die Benachrichtigung – die
-          # E-Mail geht schon beim Anlegen raus, daher wird es sofort
-          # geschlossen und die Liste offener Issues bleibt leer. Der Inhalt
-          # bleibt unter den geschlossenen Issues lesbar.
-          gh issue close "$url" --reason completed
 
       - name: Zustand ins Repo zurückspeichern
         run: |

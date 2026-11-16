@@ -85,7 +85,7 @@ alle aktuellen Termine gemeldet, auch bereits bekannte – praktisch, um zu
 prüfen, ob alles läuft, oder als „zeig mir, was gerade läuft“.
 
 ```bash
-gh workflow run watch.yml --repo Lassemind/cinemacity-watchdog -f force_report=true
+gh workflow run watch.yml --repo Lassemind/dune-imax-prag -f force_report=true
 ```
 
 ## Lokal ausführen

@@ -216,60 +216,71 @@ def fmt_short(iso):
     return f"{dt.day}.{dt.month}."
 
 
-def fmt_free(e):
-    """'noch 23 von 385 Plätzen frei' bzw. '6 % frei'; None, wenn die API nichts liefert."""
+def free_seats(e):
+    """(Anzahl freie Plätze, Saalgröße) oder (None, None), wenn unbekannt."""
     ratio = e.get("free")
-    if ratio is None or e["soldOut"]:
-        return None
+    if e["soldOut"]:
+        return 0, HALL_SEATS.get((e.get("auditorium") or "").lower())
+    if ratio is None:
+        return None, None
     seats = HALL_SEATS.get((e.get("auditorium") or "").lower())
-    if seats:
-        n = round(ratio * seats)
-        return f"noch {n} von {seats} Plätzen frei"
-    return f"{ratio:.0%} frei"
+    return (round(ratio * seats), seats) if seats else (None, None)
 
 
-def render(new_events, gone_events):
-    """Markdown-Text der Meldung."""
+def fmt_free(e):
+    """Kurzer, verständlicher Text zu den freien Plätzen, mit Ampel."""
+    n, _ = free_seats(e)
+    if e["soldOut"] or n == 0:
+        return "⛔ ausverkauft"
+    if n is None:
+        ratio = e.get("free")
+        return f"{ratio:.0%} frei" if ratio is not None else "?"
+    dot = "🔴" if n < 15 else ("🟡" if n < 50 else "🟢")
+    return f"{dot} {n} frei"
+
+
+def nice_cinema(name):
+    """'Praha Flora, OC FLORA' → 'Cinema City Flora, Prag'."""
+    if "flora" in name.lower():
+        return "Cinema City Flora, Prag (Vinohradská 151)"
+    return f"Cinema City {name}"
+
+
+def render(new_events, gone_events, mention=None):
+    """Markdown-Text der Meldung (wird von GitHub als E-Mail verschickt)."""
     lines = []
+    if mention:
+        lines.append(f"Hallo @{mention},\n")
     if new_events:
-        lines.append(f"### Neu eingestellt ({len(new_events)})\n")
+        n = len(new_events)
+        lines.append(
+            f"es {'gibt einen neuen Termin' if n == 1 else f'gibt **{n} neue Termine'}"
+            f"{'' if n == 1 else '**'} für **Dune: Part Three in IMAX 70mm**.\n"
+        )
         for cinema, group in group_by_cinema(new_events):
-            lines.append(f"**{cinema}**\n")
+            lines.append(f"📍 **{nice_cinema(cinema)}** · Englisch mit tschechischen Untertiteln\n")
+            lines.append("| Tag | Uhrzeit | Freie Plätze | |")
+            lines.append("|---|---|---|---|")
             for e in group:
-                flags = []
-                if "70-mm" in e["attrs"]:
-                    flags.append("70mm")
-                if "subbed" in e["attrs"]:
-                    flags.append("Untertitel")
-                if "dubbed" in e["attrs"]:
-                    flags.append("synchronisiert")
-                if e["soldOut"]:
-                    flags.append("**ausverkauft**")
-                free = fmt_free(e)
-                if free:
-                    flags.append(free)
-                suffix = f" — {', '.join(flags)}" if flags else ""
-                link = f" — [Tickets kaufen]({e['booking']})" if e["booking"] else ""
-                lines.append(f"- {fmt_dt(e['datetime'])} · {e['auditorium']}{suffix}{link}")
+                dt = datetime.fromisoformat(e["datetime"])
+                day = f"{DE_DAYS[dt.weekday()]} {dt.day}.{dt.month}."
+                lines.append(
+                    f"| {day} | **{dt:%H:%M}** | {fmt_free(e)} | [👉 Tickets kaufen]({e['booking']}) |"
+                )
             lines.append("")
+        lines.append("Gute Plätze sind schnell weg – am besten gleich buchen.\n")
     if gone_events:
-        lines.append(f"### Aus dem Programm verschwunden ({len(gone_events)})\n")
+        lines.append(f"⚠️ **Diese Vorstellungen wurden aus dem Programm genommen ({len(gone_events)}):**\n")
         for cinema, group in group_by_cinema(gone_events):
-            lines.append(f"**{cinema}**\n")
             for e in group:
-                lines.append(f"- {fmt_dt(e['datetime'])} · {e['auditorium']}")
-            lines.append("")
-    film_link = next(
-        (e["filmLink"] for e in list(new_events) + list(gone_events) if e.get("filmLink")),
-        None,
-    )
-    if film_link:
-        lines.append(f"[Filmseite bei Cinema City]({film_link})")
-    lines.append("")
+                dt = datetime.fromisoformat(e["datetime"])
+                lines.append(f"- {DE_DAYS[dt.weekday()]} {dt.day}.{dt.month}. um {dt:%H:%M}")
+        lines.append("")
+    lines.append("---")
     lines.append(
-        f"<sub>Geprüft am {now():%d.%m.%Y um %H:%M} · "
-        f"Film ~ `{FILM_PATTERN}` + `{FILM_REQUIRE}` · Saal ~ `{AUDITORIUM_PATTERN}` · "
-        f"Attribut `{REQUIRE_ATTR or '–'}` · freie Plätze zum Zeitpunkt der Prüfung</sub>"
+        f"<sub>Freie Plätze: Stand {now():%d.%m. um %H:%M} Uhr (der Saal hat 385 Plätze). "
+        "🟢 50+ · 🟡 15–49 · 🔴 unter 15. "
+        "Diese Mail kommt von deinem Dune-Wächter auf GitHub.</sub>"
     )
     return "\n".join(lines)
 
@@ -282,14 +293,13 @@ def group_by_cinema(events):
 
 
 def title_for(new_events):
-    film = new_events[0]["film"]
     days = sorted({e["datetime"][:10] for e in new_events})
     span = fmt_short(days[0])
     if len(days) > 1:
         span += f"–{fmt_short(days[-1])}"
     n = len(new_events)
     word = "neuer Termin" if n == 1 else "neue Termine"
-    return f"🎬 {film} im IMAX: {n} {word} ({span})"
+    return f"🎬 Dune 3 in IMAX 70mm Prag: {n} {word} ({span})"
 
 
 def gh_output(**kwargs):
@@ -343,12 +353,12 @@ def main():
         gh_output(has_news="false")
         return
 
-    body = render(new_events, gone)
+    body = render(new_events, gone, mention=os.environ.get("MENTION"))
     if new_events:
         title = title_for(new_events)
     else:
         film = gone[0]["film"]
-        title = f"🎬 {film} im IMAX: abgesagte Termine"
+        title = "🎬 Dune 3 in IMAX 70mm Prag: Termine abgesagt"
     with open(args.report, "w", encoding="utf-8") as fh:
         fh.write(body + "\n")
     with open(args.title, "w", encoding="utf-8") as fh:
