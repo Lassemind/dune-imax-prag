@@ -32,7 +32,9 @@ Läuft in GitHub Actions, funktioniert also auch, wenn der Mac aus ist.
   [`state/seen.json`](state/seen.json), die der Workflow nach jedem Lauf
   zurückcommittet. Gemeldet werden also nur Neuzugänge.
 - Neue Vorstellungen → Issue mit Uhrzeit, Saal, Merkmalen (70mm / Untertitel /
-  ausverkauft) und direktem Link zum Ticketkauf. Gemeldet werden auch Termine,
+  ausverkauft), **Anzahl freier Plätze** und direktem Link zum Ticketkauf. Die
+  freien Plätze kommen aus `availabilityRatio` der API × Saalgröße (IMAX VOLVO:
+  385 Plätze) und gelten für den Zeitpunkt der Prüfung. Gemeldet werden auch Termine,
   die aus dem Programm **verschwinden** (abgesagte Vorstellungen).
 - Das Issue wird **direkt nach dem Anlegen geschlossen**. Es dient nur als
   Zustellkanal für die E-Mail, die GitHub schon beim Anlegen verschickt – die
@@ -48,7 +50,9 @@ Ein Lauf sind ~45 HTTP-Anfragen und dauert ~20 Sekunden.
 ## Was genau überwacht wird
 
 Vorstellungen, bei denen der **Filmtitel** `duna` **und** `část třetí` enthält
-**und** der **Saalname** `imax` enthält. Derzeit trifft das auf genau ein Kino
+**und** der **Saalname** `imax` enthält **und** die Vorstellung als
+**70mm** markiert ist (digitale IMAX-Vorstellungen im selben Saal werden
+ignoriert). Derzeit trifft das auf genau ein Kino
 in Tschechien zu – **Praha Flora**, Saal `IMAX VOLVO`, wo Duna: část třetí in
 70mm mit tschechischen Untertiteln läuft. Die Wiederaufführung von Teil 1
 (ebenfalls „Duna“) wird dadurch ausgefiltert.
@@ -66,6 +70,7 @@ Das Verhalten lässt sich über Umgebungsvariablen im Workflow ändern:
 | `FILM_PATTERN` | `duna` | Teilstring des Filmtitels (Groß-/Kleinschreibung egal) |
 | `FILM_REQUIRE` | `část třetí` | muss zusätzlich im Filmtitel stehen (leer = aus) |
 | `AUDITORIUM_PATTERN` | `imax` | Teilstring des Saalnamens |
+| `REQUIRE_ATTR` | `70-mm` | Vorstellung muss dieses Attribut haben (leer = aus) |
 | `HORIZON_DAYS` | `180` | wie weit im Voraus abgefragt wird |
 | `HINT_ATTR` | `70-mm` | Attribut, um Kandidaten-Kinos günstig zu finden |
 | `REQUEST_DELAY` | `0.25` | Pause zwischen API-Anfragen (s) |

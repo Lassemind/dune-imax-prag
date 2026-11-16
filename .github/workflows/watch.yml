@@ -52,6 +52,7 @@ jobs:
           FILM_PATTERN: duna
           FILM_REQUIRE: "část třetí"
           AUDITORIUM_PATTERN: imax
+          REQUIRE_ATTR: 70-mm
         run: |
           python3 watch.py \
             --state state/seen.json \

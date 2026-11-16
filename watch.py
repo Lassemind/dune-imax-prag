@@ -32,11 +32,19 @@ AUDITORIUM_PATTERN = os.environ.get("AUDITORIUM_PATTERN", "imax").lower()
 # Zusätzlich muss der Filmtitel das enthalten (leer = aus). Filtert z. B. die
 # Wiederaufführung von Teil 1, die ebenfalls "Duna" heißt.
 FILM_REQUIRE = os.environ.get("FILM_REQUIRE", "část třetí").lower()
+# Nur Vorstellungen mit diesem Attribut melden (leer = aus). "70-mm" schließt
+# digitale IMAX-Vorstellungen im selben Saal aus.
+REQUIRE_ATTR = os.environ.get("REQUIRE_ATTR", "70-mm")
 HORIZON_DAYS = int(os.environ.get("HORIZON_DAYS", "180"))
 # Attribut, nach dem die API Kinos filtern kann – ein günstiger Hinweis, wo
 # IMAX-Säle zu suchen sind. Ergänzt (ersetzt nicht) die Probe nach Saalnamen.
 HINT_ATTR = os.environ.get("HINT_ATTR", "70-mm")
 DELAY = float(os.environ.get("REQUEST_DELAY", "0.25"))
+
+# Sitzplätze pro Saal, um aus availabilityRatio (Anteil freier Plätze) eine
+# Anzahl zu machen. Für IMAX VOLVO (Praha Flora) ergeben alle beobachteten
+# Ratios × 385 exakt ganze Zahlen. Unbekannte Säle zeigen nur den Prozentwert.
+HALL_SEATS = {"imax volvo": 385}
 
 DE_DAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
 
@@ -134,6 +142,8 @@ def collect():
                     continue
                 if not is_target_hall(e):
                     continue
+                if REQUIRE_ATTR and REQUIRE_ATTR not in e.get("attributeIds", []):
+                    continue
                 found[e["id"]] = {
                     "id": e["id"],
                     "film": film.get("name", e["filmId"]),
@@ -154,6 +164,7 @@ def collect():
                     # zu 404 – er muss weggelassen werden.
                     "booking": f"https://tickets.cinemacity.cz/order/{e.get('presentationCode') or e['id']}",
                     "soldOut": bool(e.get("soldOut")),
+                    "free": e.get("availabilityRatio"),
                 }
     return found
 
@@ -205,6 +216,18 @@ def fmt_short(iso):
     return f"{dt.day}.{dt.month}."
 
 
+def fmt_free(e):
+    """'noch 23 von 385 Plätzen frei' bzw. '6 % frei'; None, wenn die API nichts liefert."""
+    ratio = e.get("free")
+    if ratio is None or e["soldOut"]:
+        return None
+    seats = HALL_SEATS.get((e.get("auditorium") or "").lower())
+    if seats:
+        n = round(ratio * seats)
+        return f"noch {n} von {seats} Plätzen frei"
+    return f"{ratio:.0%} frei"
+
+
 def render(new_events, gone_events):
     """Markdown-Text der Meldung."""
     lines = []
@@ -222,6 +245,9 @@ def render(new_events, gone_events):
                     flags.append("synchronisiert")
                 if e["soldOut"]:
                     flags.append("**ausverkauft**")
+                free = fmt_free(e)
+                if free:
+                    flags.append(free)
                 suffix = f" — {', '.join(flags)}" if flags else ""
                 link = f" — [Tickets kaufen]({e['booking']})" if e["booking"] else ""
                 lines.append(f"- {fmt_dt(e['datetime'])} · {e['auditorium']}{suffix}{link}")
@@ -242,7 +268,8 @@ def render(new_events, gone_events):
     lines.append("")
     lines.append(
         f"<sub>Geprüft am {now():%d.%m.%Y um %H:%M} · "
-        f"Film ~ `{FILM_PATTERN}` + `{FILM_REQUIRE}` · Saal ~ `{AUDITORIUM_PATTERN}`</sub>"
+        f"Film ~ `{FILM_PATTERN}` + `{FILM_REQUIRE}` · Saal ~ `{AUDITORIUM_PATTERN}` · "
+        f"Attribut `{REQUIRE_ATTR or '–'}` · freie Plätze zum Zeitpunkt der Prüfung</sub>"
     )
     return "\n".join(lines)
 
