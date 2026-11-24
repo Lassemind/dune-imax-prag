@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-16T14:21:04",
+ "updated": "2026-11-24T22:23:55",
  "events": {
   "248952": {
    "id": "248952",
@@ -21,7 +21,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/248952",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0156
   },
   "248958": {
    "id": "248958",
@@ -43,7 +44,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/248958",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0156
   },
   "249034": {
    "id": "249034",
@@ -65,7 +67,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/249034",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0208
   },
   "267892": {
    "id": "267892",
@@ -87,7 +90,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267892",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0623
   },
   "267900": {
    "id": "267900",
@@ -109,7 +113,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267900",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0519
   },
   "267902": {
    "id": "267902",
@@ -131,7 +136,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267902",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0675
   },
   "267904": {
    "id": "267904",
@@ -153,7 +159,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267904",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0519
   },
   "267905": {
    "id": "267905",
@@ -175,7 +182,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267905",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0442
   },
   "267906": {
    "id": "267906",
@@ -197,7 +205,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267906",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0883
   },
   "267908": {
    "id": "267908",
@@ -219,7 +228,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267908",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0805
   },
   "267909": {
    "id": "267909",
@@ -241,7 +251,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267909",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0468
   },
   "267910": {
    "id": "267910",
@@ -263,7 +274,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267910",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0545
   },
   "267911": {
    "id": "267911",
@@ -285,7 +297,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267911",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0597
   },
   "267913": {
    "id": "267913",
@@ -307,7 +320,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267913",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0442
   },
   "267914": {
    "id": "267914",
@@ -329,7 +343,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267914",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0364
   },
   "267915": {
    "id": "267915",
@@ -351,7 +366,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267915",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0597
   },
   "267916": {
    "id": "267916",
@@ -373,7 +389,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267916",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0649
   },
   "267922": {
    "id": "267922",
@@ -395,7 +412,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267922",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0727
   },
   "267926": {
    "id": "267926",
@@ -417,29 +435,8 @@
     "subbed"
    ],
    "booking": "https://tickets.cinemacity.cz/order/267926",
-   "soldOut": false
-  },
-  "267928": {
-   "id": "267928",
-   "film": "Duna: část třetí",
-   "filmLink": "https://www.cinemacity.cz/films/duna-cast-treti/8105s2r",
-   "cinema": "Praha Flora, OC FLORA",
-   "cinemaId": "1052",
-   "datetime": "2026-12-20T20:40:00",
-   "auditorium": "IMAX VOLVO",
-   "attrs": [
-    "12-plus",
-    "2d",
-    "70-mm",
-    "action",
-    "adventure",
-    "drama",
-    "first-subbed-lang-cs",
-    "sci-fi",
-    "subbed"
-   ],
-   "booking": "https://tickets.cinemacity.cz/order/267928",
-   "soldOut": false
+   "soldOut": false,
+   "free": 0.0545
   }
  }
 }
